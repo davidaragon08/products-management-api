@@ -72,8 +72,6 @@ API
 
 ## 🔄 Flujo de Ejecución (Mermaid)
 
-```mermaid
-sequenceDiagram
     Client ->> API Controller: HTTP Request
     API Controller ->> Application Service: Caso de uso
     Application Service ->> Repository: Acceso a datos
