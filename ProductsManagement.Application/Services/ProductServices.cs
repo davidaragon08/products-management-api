@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace ProductsManagement.Application.Services;
 
+
 public class ProductService : IProductService
 {
     private readonly IProductRepository _productRepository;
@@ -23,7 +24,7 @@ public class ProductService : IProductService
     // GET list (paginación + filtro + ordenación)
     public virtual async Task<PagedResult<ProductDto>> GetProductsAsync(ProductQueryDto query)
     {
-        _logger.LogInformation("Listing products. Page={Page}, PageSize={PageSize}, Search={Search}, SortBy={SortBy}, SortDirection={SortDirection}",
+        _logger.LogInformation("Listando productos. Page={Page}, PageSize={PageSize}, Search={Search}, SortBy={SortBy}, SortDirection={SortDirection}",
             query.Page, query.PageSize, query.Search, query.SortBy, query.SortDirection);
 
         var products = await _productRepository.GetAllAsync();
@@ -68,13 +69,13 @@ public class ProductService : IProductService
 
     public virtual async Task<ProductDto?> GetByIdAsync(Guid id)
     {
-        _logger.LogInformation("Retrieving product with Id: {Id}", id);
+        _logger.LogInformation("Obteniendo producto. Id={Id}", id);
 
         var product = await _productRepository.GetByIdAsync(id);
 
         if (product is null)
         {
-            _logger.LogWarning("Product with Id: {Id} not found.", id);
+            _logger.LogWarning("Producto no encontrado. Id={Id}", id);
             return null;
         }
 
@@ -83,7 +84,7 @@ public class ProductService : IProductService
 
     public virtual async Task<ProductDto> CreateAsync(CreateProductDto dto)
     {
-        _logger.LogInformation("Creating product with Name: {Name}", dto.Name);
+        _logger.LogInformation("Creando producto. Name={Name}", dto.Name);
 
         var product = new Product
         {
@@ -96,19 +97,21 @@ public class ProductService : IProductService
 
         await _productRepository.AddAsync(product);
 
-        _logger.LogInformation("Product created successfully with Id: {Id}", product.Id);
+        _logger.LogInformation("Producto creado correctamente. Id={Id}", product.Id);
         return ToDto(product);
     }
+
+
 
     // PUT (reemplazo completo)
     public virtual async Task<ProductDto?> ReplaceAsync(Guid id, UpdateProductDto dto)
     {
-        _logger.LogInformation("Replacing product. Id: {Id}, ExpectedVersion: {Version}", id, dto.Version);
+        _logger.LogInformation("Reemplazando producto. Id={Id}, VersionEsperada={Version}", id, dto.Version);
 
         var existing = await _productRepository.GetByIdAsync(id);
         if (existing is null)
         {
-            _logger.LogWarning("Product with Id: {Id} not found for update.", id);
+            _logger.LogWarning("Producto no encontrado para reemplazo. Id={Id}", id);
             return null;
         }
 
@@ -118,19 +121,19 @@ public class ProductService : IProductService
 
         await _productRepository.UpdateAsync(existing, dto.Version);
 
-        _logger.LogInformation("Product replaced successfully. Id: {Id}, NewVersion: {NewVersion}", id, existing.Version);
+        _logger.LogInformation("Producto reemplazado. Id={Id}, NuevaVersion={NewVersion}", id, existing.Version);
         return ToDto(existing);
     }
 
     // PATCH (actualización parcial)
     public virtual async Task<ProductDto?> PatchAsync(Guid id, PatchProductDto dto)
     {
-        _logger.LogInformation("Patching product. Id: {Id}, ExpectedVersion: {Version}", id, dto.Version);
+        _logger.LogInformation("Actualizando parcialmente producto. Id={Id}, VersionEsperada={Version}", id, dto.Version);
 
         var existing = await _productRepository.GetByIdAsync(id);
         if (existing is null)
         {
-            _logger.LogWarning("Product with Id: {Id} not found for patch.", id);
+            _logger.LogWarning("Producto no encontrado para patch. Id={Id}", id);
             return null;
         }
 
@@ -138,24 +141,24 @@ public class ProductService : IProductService
 
         await _productRepository.UpdateAsync(existing, dto.Version);
 
-        _logger.LogInformation("Product patched successfully. Id: {Id}, NewVersion: {NewVersion}", id, existing.Version);
+        _logger.LogInformation("Producto actualizado parcialmente. Id={Id}, NuevaVersion={NewVersion}", id, existing.Version);
         return ToDto(existing);
     }
 
     public virtual async Task<bool> DeleteAsync(Guid id, int expectedVersion)
     {
-        _logger.LogInformation("Deleting product. Id: {Id}, ExpectedVersion: {Version}", id, expectedVersion);
+        _logger.LogInformation("Eliminando producto. Id={Id}, VersionEsperada={Version}", id, expectedVersion);
 
         var existing = await _productRepository.GetByIdAsync(id);
         if (existing is null)
         {
-            _logger.LogWarning("Product with Id: {Id} not found for deletion.", id);
+            _logger.LogWarning("Producto no encontrado para eliminación. Id={Id}", id);
             return false;
         }
 
         await _productRepository.DeleteAsync(id, expectedVersion);
 
-        _logger.LogInformation("Product deleted successfully. Id: {Id}", id);
+        _logger.LogInformation("Producto eliminado correctamente. Id={Id}", id);
         return true;
     }
 
